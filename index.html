@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+  <title>Boutique Home Page</title>
+  <style>
+    html{
+      scroll-behavior: smooth;
+    }
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: #4B5563;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .btn-hover {
+      transition: all 0.3s ease;
+    }
+    .btn-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .slider-container {
+      position: relative;
+      overflow: hidden;
+    }
+    .slider-wrapper {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    .slide {
+      flex: 0 0 100%;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .slide.active {
+      opacity: 1;
+      position: relative;
+    }
+    @media (max-width: 640px) {
+      .mobile-menu {
+        display: none;
+      }
+      .mobile-menu.open {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body class="font-sans bg-gray-50">
+
+  <button id="backToTopBtn" class="fixed bottom-4 right-4 z-50 bg-gray-800 text-white p-2 rounded shadow-lg opacity-0 transition-opacity duration-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+
+  <script>
+    const backToTopBtn = document.getElementById('backToTopBtn');
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTopBtn.classList.remove('opacity-0');
+        backToTopBtn.classList.add('opacity-100');
+      } else {
+        backToTopBtn.classList.remove('opacity-100');
+        backToTopBtn.classList.add('opacity-0');
+      }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  </script>
+  
+  <nav x-data="{ open: false }" class="bg-white shadow-lg fixed w-full z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex">
+          <div class="flex-shrink-0 flex items-center">
+            <a href="#" class="text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors duration-300">Chic Boutique</a>
+          </div>
+          <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <a href="#" class="nav-link border-gray-800 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+            <a href="#shop" class="nav-link border-transparent text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Shop</a>
+            <a href="#about" class="nav-link border-transparent text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">About</a>
+            <a href="#blog" class="nav-link border-transparent text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Blog</a>
+            <a href="#contact" class="nav-link border-transparent text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
+          </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center">
+          <button class="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-300">
+            <span class="sr-only">View cart</span>
+            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </button>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <button @click="open = !open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500 transition-colors duration-300">
+            <span class="sr-only">Open main menu</span>
+            <svg x-show="!open" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg x-show="open" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div x-show="open" class="sm:hidden mobile-menu z-30 absolute w-full bg-white" :class="{'open': open}">
+      <div class="pt-2 pb-3 space-y-1">
+        <a href="#" class="bg-gray-100 border-gray-800 text-gray-900 block pl-3 pr-4 py-2 border-l-4 text-base font-medium hover:bg-gray-200 transition-colors duration-300">Home</a>
+        <a href="#shop" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-300">Shop</a>
+        <a href="#about" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-300">About</a>
+        <a href="#blog" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-300">Blog</a>
+        <a href="#contact" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-300">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="mt-16 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div x-data="{ 
+        activeSlide: 0,
+        slides: [
+          { title: 'Discover Your Style', description: 'Explore our curated collection of chic and trendy fashion pieces.', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80' },
+          { title: 'Embrace Elegance', description: 'Elevate your wardrobe with our sophisticated and timeless designs.', image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80' },
+          { title: 'Fashion Forward', description: 'Stay ahead of the curve with our latest fashion-forward styles.', image: 'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80' }
+        ],
+        nextSlide() {
+          this.activeSlide = (this.activeSlide + 1) % this.slides.length;
+        },
+        prevSlide() {
+          this.activeSlide = (this.activeSlide - 1 + this.slides.length) % this.slides.length;
+        }
+      }" 
+      x-init="
+        setInterval(() => nextSlide(), 5000);
+      "
+      class="relative bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+          <div class="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
+            <main class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
+              <div class="sm:text-center lg:text-left">
+                <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                  <span x-text="slides[activeSlide].title" class="block xl:inline"></span>
+                </h1>
+                <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                  <span x-text="slides[activeSlide].description"></span>
+                </p>
+                <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                  <div class="rounded-md shadow">
+                    <a href="#" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 md:py-4 md:text-lg md:px-10 btn-hover">
+                      Shop Now
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 slider-container">
+          <div class="slider-wrapper">
+            <template x-for="(slide, index) in slides" :key="index">
+              <div :class="{ 'active': activeSlide === index }" class="slide">
+                <img :src="slide.image" class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full" :alt="slide.title">
+              </div>
+            </template>
+          </div>
+          <button @click="prevSlide" class="absolute top-1/2 left-4 z-10 transform -translate-y-1/2 bg-white bg-opacity-50 rounded-full p-2 focus:outline-none hover:bg-opacity-75 transition-all duration-300">
+            <svg class="h-6 w-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <button @click="nextSlide" class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white bg-opacity-50 rounded-full p-2 focus:outline-none hover:bg-opacity-75 transition-all duration-300">
+            <svg class="h-6 w-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="flex justify-center mt-4">
+        <template x-for="(slide, index) in slides" :key="index">
+          <button @click="activeSlide = index" :class="{ 'bg-gray-800': activeSlide === index, 'bg-gray-300': activeSlide !== index }" class="h-3 w-3 rounded-full mx-1 hover:bg-gray-600 transition-colors duration-300"></button>
+        </template>
+      </div>
+    </div>
+  </main>
+
+  <section id="shop" class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center">
+        <h2 class="text-base text-gray-600 font-semibold tracking-wide uppercase">Curated Collection</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          Elegance Redefined
+        </p>
+      </div>
+
+      <div class="mt-10">
+        <div x-data="{ 
+          products: [
+            { id: 1, name: 'Silk Chiffon Blouse', description: 'Ethereal and lightweight, perfect for any occasion', price: 129.99, image: 'https://images.unsplash.com/photo-1624206112918-f140f087f9b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80', colors: ['White', 'Blush', 'Lavender'] },
+            { id: 2, name: 'Tailored Wool Blazer', description: 'Timeless sophistication for the modern woman', price: 249.99, image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80', colors: ['Black', 'Navy', 'Camel'] },
+            { id: 3, name: 'Leather Ankle Boots', description: 'Handcrafted Italian leather with a sleek silhouette', price: 189.99, image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80', colors: ['Black', 'Brown', 'Burgundy'] }
+          ],
+          selectedColor: {},
+          hoveredProduct: null
+        }" class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <template x-for="product in products" :key="product.id">
+            <div 
+              class="bg-white overflow-hidden shadow-lg rounded-lg transform transition duration-500 hover:scale-105"
+              @mouseenter="hoveredProduct = product.id"
+              @mouseleave="hoveredProduct = null"
+            >
+              <div class="relative">
+                <img :src="product.image" :alt="product.name" class="w-full h-64 object-cover">
+                <div 
+                  x-show="hoveredProduct === product.id"
+                  x-transition:enter="transition ease-out duration-300"
+                  x-transition:enter-start="opacity-0"
+                  x-transition:enter-end="opacity-100"
+                  x-transition:leave="transition ease-in duration-300"
+                  x-transition:leave-start="opacity-100"
+                  x-transition:leave-end="opacity-0"
+                  class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center"
+                >
+                  <button 
+                    @click="selectedColor[product.id] = product.colors[0]; $nextTick(() => $refs[`colorSelect${product.id}`].focus())"
+                    class="bg-white text-gray-800 py-2 px-4 rounded-full hover:bg-gray-100 transition duration-300"
+                  >
+                    Quick View
+                  </button>
+                </div>
+              </div>
+              <div class="p-6">
+                <h3 x-text="product.name" class="text-lg font-medium text-gray-900"></h3>
+                <p x-text="product.description" class="mt-2 text-sm text-gray-500"></p>
+                <p x-text="'$' + product.price.toFixed(2)" class="mt-2 text-lg font-semibold text-gray-900"></p>
+                <div class="mt-4">
+                  <label :for="'colorSelect' + product.id" class="block text-sm font-medium text-gray-700">Color</label>
+                  <select 
+                    :id="'colorSelect' + product.id"
+                    :ref="'colorSelect' + product.id"
+                    x-model="selectedColor[product.id]"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm rounded-md"
+                  >
+                    <option value="" disabled selected>Select a color</option>
+                    <template x-for="color in product.colors" :key="color">
+                      <option x-text="color"></option>
+                    </template>
+                  </select>
+                </div>
+                <button 
+                  @click="selectedColor[product.id] ? alert('Added ' + product.name + ' in ' + selectedColor[product.id] + ' to cart!') : alert('Please select a color')"
+                  class="mt-4 w-full bg-gray-800 text-white py-2 px-4 rounded-full hover:bg-gray-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="py-8 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center mb-8">
+        <h2 class="text-base text-gray-600 font-semibold tracking-wide uppercase">Style Guide</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">Discover Your Perfect Look</p>
+      </div>
+      <div x-data="{
+        activeTab: 'casual',
+        tabs: [
+          { id: 'casual', name: 'Casual Chic', icon: '👚' },
+          { id: 'formal', name: 'Formal Elegance', icon: '👔' },
+          { id: 'bohemian', name: 'Bohemian Spirit', icon: '🌸' }
+        ],
+        outfits: {
+          casual: [
+            { name: 'Weekend Wanderer', items: ['Distressed Jeans', 'White T-shirt', 'Denim Jacket', 'Sneakers'], image: 'https://images.unsplash.com/photo-1523359346063-d879354c0ea5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&q=80' },
+            { name: 'Coffee Date', items: ['Floral Dress', 'Cardigan', 'Ankle Boots', 'Crossbody Bag'], image: 'https://images.unsplash.com/photo-1534126416832-a88fdf2911c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&q=80' }
+          ],
+          formal: [
+            { name: 'Power Suit', items: ['Tailored Blazer', 'Matching Trousers', 'Silk Blouse', 'Pumps'], image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&q=80' },
+            { name: 'Cocktail Ready', items: ['Little Black Dress', 'Statement Necklace', 'Clutch', 'Stilettos'], image: 'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&q=80' }
+          ],
+          bohemian: [
+            { name: 'Festival Vibes', items: ['Maxi Skirt', 'Crop Top', 'Fringe Vest', 'Gladiator Sandals'], image: 'https://images.unsplash.com/photo-1517256673644-36ad11246d21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&q=80' },
+            { name: 'Artsy Afternoon', items: ['Palazzo Pants', 'Off-shoulder Blouse', 'Layered Necklaces', 'Wedges'], image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&h=200&q=80' }
+          ]
+        },
+        hoveredOutfit: null
+      }" class="bg-white shadow-xl rounded-lg overflow-hidden">
+        <div class="border-b border-gray-200">
+          <nav class="-mb-px flex">
+            <template x-for="tab in tabs" :key="tab.id">
+              <a @click.prevent="activeTab = tab.id" :class="{ 'border-gray-800 text-gray-900': activeTab === tab.id, 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== tab.id }" class="w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm cursor-pointer transition-colors duration-200 flex items-center justify-center">
+                <span x-text="tab.icon" class="mr-2 text-xl"></span>
+                <span x-text="tab.name" class="hidden sm:inline"></span>
+              </a>
+            </template>
+          </nav>
+        </div>
+        <div class="p-4 sm:p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <template x-for="outfit in outfits[activeTab]" :key="outfit.name">
+              <div class="relative overflow-hidden rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105" @mouseenter="hoveredOutfit = outfit.name" @mouseleave="hoveredOutfit = null">
+                <img :src="outfit.image" :alt="outfit.name" class="w-full h-48 object-cover">
+                <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                  <div class="text-white text-center p-4">
+                    <h3 x-text="outfit.name" class="text-lg font-semibold mb-2"></h3>
+                    <ul class="text-sm">
+                      <template x-for="item in outfit.items" :key="item">
+                        <li x-text="item" class="mb-1 last:mb-0"></li>
+                      </template>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 text-center">
+        <a href="#" class="inline-block bg-gray-800 text-white py-3 px-6 rounded-full hover:bg-gray-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transform hover:scale-105">
+          Explore Full Style Guide
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="blog" class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center mb-8">
+        <h2 class="text-base text-indigo-600 font-semibold tracking-wide uppercase">Fashion Blog</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">Latest Style Insights</p>
+      </div>
+      <div class="mt-10 grid gap-10 lg:grid-cols-3 lg:max-w-none">
+        <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
+          <div class="flex-shrink-0">
+            <img class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Fashion trends">
+          </div>
+          <div class="flex-1 bg-white p-6 flex flex-col justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-indigo-600">
+                <a href="#" class="hover:underline">Trends</a>
+              </p>
+              <a href="#" class="block mt-2">
+                <p class="text-xl font-semibold text-gray-900">Summer 2023 Fashion Trends You Need to Know</p>
+                <p class="mt-3 text-base text-gray-500">Discover the hottest trends for the upcoming summer season and learn how to incorporate them into your wardrobe.</p>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
+          <div class="flex-shrink-0">
+            <img class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Sustainable fashion">
+          </div>
+          <div class="flex-1 bg-white p-6 flex flex-col justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-indigo-600">
+                <a href="#" class="hover:underline">Sustainability</a>
+              </p>
+              <a href="#" class="block mt-2">
+                <p class="text-xl font-semibold text-gray-900">Eco-Friendly Fashion: How to Build a Sustainable Wardrobe</p>
+                <p class="mt-3 text-base text-gray-500">Learn about sustainable fashion practices and how you can make more environmentally conscious choices in your style.</p>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
+          <div class="flex-shrink-0">
+            <img class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Accessorizing">
+          </div>
+          <div class="flex-1 bg-white p-6 flex flex-col justify-between">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-indigo-600">
+                <a href="#" class="hover:underline">Style Tips</a>
+              </p>
+              <a href="#" class="block mt-2">
+                <p class="text-xl font-semibold text-gray-900">The Art of Accessorizing: Elevate Your Outfit with the Right Pieces</p>
+                <p class="mt-3 text-base text-gray-500">Explore how to choose and style accessories to complement your outfits and express your personal style.</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">Frequently Asked Questions</h2>
+      <div class="space-y-3 sm:space-y-4" x-data="{ activeIndex: null }">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <button @click="activeIndex = activeIndex === 0 ? null : 0" class="w-full px-4 sm:px-6 py-4 sm:py-6 text-left focus:outline-none">
+            <div class="flex items-center justify-between">
+              <span class="text-base sm:text-lg font-medium text-gray-800">What's our return policy?</span>
+              <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 transition-transform duration-300" :class="{'transform rotate-180': activeIndex === 0}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
+          <div x-show="activeIndex === 0" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="px-4 sm:px-6 pb-4">
+            <p class="text-sm sm:text-base text-gray-600">We offer a 30-day return policy for items in their original condition with tags attached. Please refer to our returns page for more details.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <button @click="activeIndex = activeIndex === 1 ? null : 1" class="w-full px-4 sm:px-6 py-4 sm:py-6 text-left focus:outline-none">
+            <div class="flex items-center justify-between">
+              <span class="text-base sm:text-lg font-medium text-gray-800">How fast can I get my order?</span>
+              <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 transition-transform duration-300" :class="{'transform rotate-180': activeIndex === 1}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
+          <div x-show="activeIndex === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="px-4 sm:px-6 pb-4">
+            <p class="text-sm sm:text-base text-gray-600">Standard shipping typically takes 3-5 business days. We also offer express shipping options for faster delivery. Check our shipping page for more information.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <button @click="activeIndex = activeIndex === 2 ? null : 2" class="w-full px-4 sm:px-6 py-4 sm:py-6 text-left focus:outline-none">
+            <div class="flex items-center justify-between">
+              <span class="text-base sm:text-lg font-medium text-gray-800">Do you offer international shipping?</span>
+              <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 transition-transform duration-300" :class="{'transform rotate-180': activeIndex === 2}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
+          <div x-show="activeIndex === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="px-4 sm:px-6 pb-4">
+            <p class="text-sm sm:text-base text-gray-600">Yes, we offer international shipping to many countries. Please visit our shipping page to see if we deliver to your location and for more details on international shipping rates and times.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <button @click="activeIndex = activeIndex === 3 ? null : 3" class="w-full px-4 sm:px-6 py-4 sm:py-6 text-left focus:outline-none">
+            <div class="flex items-center justify-between">
+              <span class="text-base sm:text-lg font-medium text-gray-800">How can I track my order?</span>
+              <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 transition-transform duration-300" :class="{'transform rotate-180': activeIndex === 3}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
+          <div x-show="activeIndex === 3" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="px-4 sm:px-6 pb-4">
+            <p class="text-sm sm:text-base text-gray-600">Once your order is shipped, you'll receive a tracking number via email. You can use this number to track your package on our website or the carrier's website.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <button @click="activeIndex = activeIndex === 4 ? null : 4" class="w-full px-4 sm:px-6 py-4 sm:py-6 text-left focus:outline-none">
+            <div class="flex items-center justify-between">
+              <span class="text-base sm:text-lg font-medium text-gray-800">Do you offer size exchanges?</span>
+              <svg class="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 transition-transform duration-300" :class="{'transform rotate-180': activeIndex === 4}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </button>
+          <div x-show="activeIndex === 4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="px-4 sm:px-6 pb-4">
+            <p class="text-sm sm:text-base text-gray-600">Yes, we offer size exchanges for unworn items within 30 days of purchase. Please contact our customer service team to initiate the exchange process.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="bg-gradient-to-br from-gray-100 to-gray-200 py-10 sm:py-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-gray-800 mb-8 sm:mb-12 md:mb-16 relative">
+        Contact Us
+        <span class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 sm:w-20 md:w-24 h-1 bg-gray-500 rounded-full"></span>
+      </h2>
+      <div class="bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-transform duration-300">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
+          <div class="relative w-full h-64 sm:h-80 md:h-96 lg:h-full overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" alt="Office" class="w-full h-full object-cover transition-transform duration-300 transform hover:scale-110">
+            <div class="absolute inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+              <p class="text-white text-xl sm:text-2xl font-semibold">Visit Our Office</p>
+            </div>
+          </div>
+          <div class="p-6 sm:p-8 md:p-10 lg:p-12 space-y-6 sm:space-y-8 bg-gradient-to-br from-gray-50 to-white">
+            <h3 class="text-2xl sm:text-3xl font-semibold text-gray-800 mb-6 sm:mb-8">Send a Message</h3>
+            <form class="space-y-4 sm:space-y-6">
+              <div class="relative">
+                <input type="text" id="name" class="w-full px-4 py-2 sm:py-3 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-gray-500 transition-all duration-300 peer" required placeholder=" ">
+                <label for="name" class="absolute left-4 top-2 sm:top-3 text-gray-400 transition-all duration-300 peer-focus:text-xs peer-focus:-top-4 peer-focus:text-gray-600 peer-placeholder-shown:top-2 sm:peer-placeholder-shown:top-3 peer-placeholder-shown:text-base">Name</label>
+              </div>
+              <div class="relative">
+                <input type="email" id="email" class="w-full px-4 py-2 sm:py-3 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-gray-500 transition-all duration-300 peer" required placeholder=" ">
+                <label for="email" class="absolute left-4 top-2 sm:top-3 text-gray-400 transition-all duration-300 peer-focus:text-xs peer-focus:-top-4 peer-focus:text-gray-600 peer-placeholder-shown:top-2 sm:peer-placeholder-shown:top-3 peer-placeholder-shown:text-base">Email</label>
+              </div>
+              <div class="relative">
+                <textarea id="message" rows="4" class="w-full px-4 py-2 sm:py-3 border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-gray-500 transition-all duration-300 peer" required placeholder=" "></textarea>
+                <label for="message" class="absolute left-4 top-2 sm:top-3 text-gray-400 transition-all duration-300 peer-focus:text-xs peer-focus:-top-4 peer-focus:text-gray-600 peer-placeholder-shown:top-2 sm:peer-placeholder-shown:top-3 peer-placeholder-shown:text-base">Message</label>
+              </div>
+              <button type="submit" class="w-full bg-gray-600 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-full hover:bg-gray-700 transition duration-300 transform hover:scale-105 shadow-lg">Send Message</button>
+            </form>
+            <div class="mt-8 sm:mt-10 md:mt-12">
+              <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">Contact Information</h4>
+              <div class="space-y-3 sm:space-y-4">
+                <p class="flex items-center text-sm sm:text-base text-gray-600 hover:text-gray-800 transition-colors duration-300">
+                  <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  123 Main St, Anytown, USA 12345
+                </p>
+                <p class="flex items-center text-sm sm:text-base text-gray-600 hover:text-gray-800 transition-colors duration-300">
+                  <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                  (555) 123-4567
+                </p>
+                <p class="flex items-center text-sm sm:text-base text-gray-600 hover:text-gray-800 transition-colors duration-300">
+                  <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                  info@example.com
+                </p>
+              </div>
+            </div>
+            <div class="mt-8 sm:mt-10 md:mt-12">
+              <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">Follow Us</h4>
+              <div class="flex space-x-4 sm:space-x-6">
+                <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors duration-300 transform hover:scale-110">
+                  <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors duration-300 transform hover:scale-110">
+                  <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-600 transition-colors duration-300 transform hover:scale-110">
+                  <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-100 text-gray-800 py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-semibold mb-4 text-gray-700">About Our Boutique</h3>
+          <p class="text-gray-600">We are a curated boutique offering unique and stylish clothing, accessories, and home decor. Our passion is to bring you the latest trends and timeless classics that reflect your individual style.</p>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold mb-4 text-gray-700">Shop Categories</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-600 hover:text-gray-800 transition-colors duration-300">Women's Fashion</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-gray-800 transition-colors duration-300">Men's Collection</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-gray-800 transition-colors duration-300">Accessories</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-gray-800 transition-colors duration-300">Home & Living</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold mb-4 text-gray-700">Stay Stylish</h3>
+          <p class="text-gray-600 mb-4">Subscribe for exclusive offers and style tips.</p>
+          <form class="relative">
+            <input type="email" placeholder="Enter your email" class="w-full bg-white text-gray-800 px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-300 pr-12">
+            <button type="submit" class="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors duration-300 transform hover:scale-105">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="mt-8 pt-8 border-t border-gray-300 text-center">
+        <p class="text-gray-600">&copy; 2024 Your Chic Boutique. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+</body>
+</html>
